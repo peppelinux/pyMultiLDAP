@@ -59,6 +59,10 @@ r = lc.search(**kwargs['search'])
 ````
 import copy
 
+from client import LdapClient
+from settings import LDAP_CONNECTIONS
+
+
 for i in LDAP_CONNECTIONS:
     lc = LdapClient(LDAP_CONNECTIONS[i])
     print('# Results from: {} ...'.format(lc))
