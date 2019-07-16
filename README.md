@@ -28,8 +28,8 @@ lc.get()
 See `run_test.py`.
 
 Difference between `.search` and `.get`:
-    - *search* relyies on connection configuration and returns result as is;
-    - *get* handles custom search filter and can retrieve result as dictionary or json format
+- *search* relyies on connection configuration and returns result as it come (raw);
+- *get* handles custom search filter and can retrieve result as dictionary or json format.
 
 ````
 import copy
@@ -70,11 +70,11 @@ for i in LDAP_CONNECTIONS:
     # get all as defined search_filter configured in settings connection
     # but in json format
     r = lc.get(format='json')
-    print(r) if r else ''
+    print(r+',') if r else ''
 
     # set a custom search as method argument
     r = lc.get(search="(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP345tg86H))")
-    print(r+',') if r else ''
+    print(r)
 
     print('# End {}'.format(i))
 ````
@@ -86,4 +86,4 @@ time python ldap_aio.py
 
 #### TODO
 
-- [settings.py] Add a modifier function to remap and rewrite attributes.
+- [settings.py] Add a modifier function to remap and rewrite attributes for every configured endpoint;
