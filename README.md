@@ -1,10 +1,18 @@
 pyLDAP
 -----
 
-Configure connections and search paramenters in `settings.py`.
+This tool was written to handle multiple LDAP sources for data aggregations tasks.
 
 
-## client.py usage
+### Setup
+Configure multiple connections and search paramenters in `settings.py`.
+
+Install dependencies
+````
+pip install -r requirements
+````
+
+#### LdapClient Class usage
 ````
 from client import LdapClient
 from settings import LDAP_CONNECTIONS
@@ -14,7 +22,10 @@ lc = LdapClient(LDAP_CONNECTIONS['SAMVICE'])
 # get all the results
 lc.get()
 ````
-## client.py usage with loggin and runtime search override
+
+#### client.py usage with logging and runtime search override
+
+See `run_test.py`.
 ````
 import copy
 import logging
@@ -46,7 +57,7 @@ r = lc.search(**kwargs['search'])
 repr_result(r)
 ````
 
-## Result in json format
+#### Results in json format
 ````
 # other
 import copy
@@ -57,22 +68,19 @@ for i in LDAP_CONNECTIONS:
     print('# Results from: {} ...'.format(lc))
     kwargs = copy.copy(lc.conf)
     r = lc.get(search="(&(sn=aie*)(givenName=isa*))")
-    print(r+',') if r else []
+    print(r+',') if r else ''
 
     # like wildcard
     r = lc.get(search="(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP345tg86H))")
-    print(r+',') if r else []
+    print(r+',') if r else ''
 
     kwargs['search']['search_filter'] = "(&(sn=de marco))"
     r = lc.search(**kwargs['search'])
 
     print('# End {}'.format(i))
-
-
-
 ````
 
-## ldap_asycio.py example
+#### ldap_asycio.py example
 ````
 time python ldap_aio.py
 ````
