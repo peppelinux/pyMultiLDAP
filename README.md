@@ -48,7 +48,6 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 stdout.setFormatter(formatter)
 logger.addHandler(stdout)
 
-
 lc = LdapClient(LDAP_CONNECTIONS['SAMVICE'])
 
 kwargs = copy.copy(lc.conf)
