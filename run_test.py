@@ -31,9 +31,8 @@ for i in LDAP_CONNECTIONS:
     r = lc.get(format='json')
     print(r+',') if r else ''
 
-    p = "{SSHA512}JeCeGQnNfC+Cc5FuCpJmBMEYx3HELlOoxhkprKOnfS7wFI3dxhjJ2ubfKdvXIzZYE78ugo/wiwnsj9xV3MuWBps80UdeEAiP"
-    search_str = "(&(userPassword={}))".format(p)
-    r = lc.get(search=search_str, format='json')
-    print(r+',') if r else ''
+    # get result in original format
+    r = lc.get()
+    print(r) if r else ''
 
     print('# End {}'.format(i))

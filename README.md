@@ -26,6 +26,11 @@ lc.get()
 #### client.py usage with logging and runtime search override
 
 See `run_test.py`.
+
+Difference between `.search` and `.get`:
+    - *search* relyies on connection configuration and returns result as is;
+    - *get* handles custom search filter and can retrieve result as dictionary or json format
+
 ````
 import copy
 import logging
@@ -33,10 +38,8 @@ import logging
 from client import LdapClient
 from settings import LDAP_CONNECTIONS
 
-def repr_result(r):
-    if r:
-        for i in r[0]: print(i)
 
+# logging
 logger = logging.getLogger('ldap_client')
 logger.setLevel(logging.DEBUG)
 stdout = logging.StreamHandler()
@@ -45,37 +48,30 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 stdout.setFormatter(formatter)
 logger.addHandler(stdout)
 
+
 lc = LdapClient(LDAP_CONNECTIONS['SAMVICE'])
+
 kwargs = copy.copy(lc.conf)
 kwargs['search']['search_filter'] = "(&(sn=de medici)(givenName=aurora))"
 r = lc.search(**kwargs['search'])
-# repr_result(r)
-
-# like wildcard
-kwargs['search']['search_filter'] = "(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP19M45D7845D))"
-r = lc.search(**kwargs['search'])
-repr_result(r)
 ````
 
 #### Results in json format
 ````
-# other
 import copy
-import logging
 
 for i in LDAP_CONNECTIONS:
     lc = LdapClient(LDAP_CONNECTIONS[i])
     print('# Results from: {} ...'.format(lc))
-    kwargs = copy.copy(lc.conf)
-    r = lc.get(search="(&(sn=aie*)(givenName=isa*))")
-    print(r+',') if r else ''
 
-    # like wildcard
+    # get all as defined search_filter configured in settings connection
+    # but in json format
+    r = lc.get(format='json')
+    print(r) if r else ''
+
+    # set a custom search as method argument
     r = lc.get(search="(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP345tg86H))")
     print(r+',') if r else ''
-
-    kwargs['search']['search_filter'] = "(&(sn=de marco))"
-    r = lc.search(**kwargs['search'])
 
     print('# End {}'.format(i))
 ````
@@ -87,4 +83,4 @@ time python ldap_aio.py
 
 #### TODO
 
-- [settings.py] Add a modifier function to remap and rewrite attributes
+- [settings.py] Add a modifier function to remap and rewrite attributes.
