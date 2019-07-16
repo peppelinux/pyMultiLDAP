@@ -1,0 +1,90 @@
+import ldap3
+
+
+SAMVICE = dict(server =
+                   dict(host = 'ldaps://thathost.unical.it',
+                        connect_timeout = 5,
+                        # TLS...
+                        ),
+               connection =
+                   dict(user = 'cn=thatusername,dc=unical,dc=it',
+                        password = 'thatpassword',
+                        read_only = True,
+                        version = 3,
+                        # see ldap3 client_strategies
+                        client_strategy = ldap3.REUSABLE,
+                        auto_bind = True,
+                        pool_size = 10,
+                        pool_keepalive = 10),
+                search =
+                    dict(search_base = 'ou=people,dc=unical,dc=it',
+                         search_filter = '(objectclass=person)',
+                         search_scope = ldap3.SUBTREE,
+
+                         # general purpose for huge resultsets
+                         # TODO: implement paged resultset, see: examples/paged_resultset.py
+                         # size_limit = 500,
+                         # paged_size = 1000, # up to 500000 results
+                         # paged_criticality = True, # check if the server supports paged results
+                         # paged_cookie = True, # must be sent back while requesting subsequent entries
+
+                         # to get all = # '*'
+                         attributes = ['eduPersonPrincipalName',
+                                       'schacHomeOrganization',
+                                       'mail',
+                                       'uid',
+                                       'givenName',
+                                       'sn',
+                                       'eduPersonScopedAffiliation',
+                                       'schacPersonalUniqueId',
+                                       'schacPersonalUniqueCode'
+                                       ]
+
+                        ),
+            )
+
+LDAPTEST = dict(server =
+                   dict(host = 'ldap://ldap.testunical.it:389',
+                        connect_timeout = 5,
+                        # TLS...
+                        ),
+               connection =
+                   dict(user = 'cn=idp1,ou=idp,dc=testunical,dc=it',
+                        password = 'idp1',
+                        read_only = True,
+                        version = 3,
+                        # see ldap3 client_strategies
+                        client_strategy = ldap3.REUSABLE,
+                        auto_bind = True,
+                        pool_size = 10,
+                        pool_keepalive = 10),
+                search =
+                    dict(search_base = 'ou=people,dc=testunical,dc=it',
+                         search_filter = '(objectclass=person)',
+                         search_scope = ldap3.SUBTREE,
+
+                         # general purpose for huge resultsets
+                         # TODO: implement paged resultset, see: examples/paged_resultset.py
+                         # size_limit = 500,
+                         # paged_size = 1000, # up to 500000 results
+                         # paged_criticality = True, # check if the server supports paged results
+                         # paged_cookie = True, # must be sent back while requesting subsequent entries
+
+                         # to get all = # '*'
+                         attributes = ['eduPersonPrincipalName',
+                                       'schacHomeOrganization',
+                                       'mail',
+                                       'uid',
+                                       'givenName',
+                                       'sn',
+                                       'eduPersonScopedAffiliation',
+                                       'schacPersonalUniqueId',
+                                       'schacPersonalUniqueCode'
+                                       ]
+
+                        ),
+            )
+
+# put multiple connections here
+LDAP_CONNECTIONS = {'SAMVICE' : SAMVICE,
+                    'LDAPTEST' : LDAPTEST}
