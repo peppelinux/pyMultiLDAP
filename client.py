@@ -48,8 +48,10 @@ class LdapClient(object):
                 result.append(entry.entry_to_json())
         else:
             for entry in r[0]:
-                result.append(json.dumps(dict(entry['attributes']),
-                                         indent=2))
+                d = {k:[e.decode(self.conf['encoding']) for e in v]
+                     for k,v in entry['raw_attributes'].items()}
+                out = json.dumps(d, indent=2)
+                result.append(out)
         return ','.join(result)
 
     def get(self, search=None, size_limit=0, format=None):
@@ -58,7 +60,7 @@ class LdapClient(object):
         _kwargs['search_filter'] = search if search else self.conf['search']['search_filter']
         r = self.search(**_kwargs)
         if not r: return
-        logger.debug(json.dumps(r[1]))
+        #logger.debug(json.dumps(r[1]))
         # format
         if format:
             method = '_as_{}'.format(format)
