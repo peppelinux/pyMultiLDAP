@@ -13,6 +13,8 @@ class LdapClient(object):
         self.conf = LDAP_SRV_CONF
         self.conn = None
         self.strategy = LDAP_SRV_CONF['connection']['client_strategy']
+        ldap3.set_config_parameter('DEFAULT_SERVER_ENCODING',
+                                   LDAP_SRV_CONF['encoding'])
 
     def get_response(self, message_id=None):
         if self.conf['connection']['client_strategy'] in (ldap3.REUSABLE,
