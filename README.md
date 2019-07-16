@@ -84,3 +84,7 @@ for i in LDAP_CONNECTIONS:
 ````
 time python ldap_aio.py
 ````
+
+#### TODO
+
+- [settings.py] Add a modifier function to remap and rewrite attributes

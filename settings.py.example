@@ -41,7 +41,7 @@ SAMVICE = dict(server =
                                        ]
 
                         ),
-                    encoding = 'utf-8'
+                    encoding = 'utf-8'                    
             )
 
 LDAPTEST = dict(server =
