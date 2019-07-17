@@ -8,13 +8,14 @@ result_set = []
 LDAP_SERVERS = []
 
 async def get_result(lc):
-    #await asyncio.sleep(0.001)
+    await asyncio.sleep(0.001)
     return lc.get(format='dict')
 
 async def get_server(CONF):
     return LdapClient(CONF)
 
 async def ensure_connection(lc):
+    await asyncio.sleep(0.001)
     lc.ensure_connection()
 
 async def connect(lc_id: int):
