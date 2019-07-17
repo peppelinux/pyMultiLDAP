@@ -47,10 +47,22 @@ DEFAULT = dict(server =
                          'name': 'replace',
                          'kwargs': {'from_str': 'unical', 'to_str': 'lacinu',}},
 
-                         {'package': 'attr_rewrite',
-                          'name': 'regexp_replace',
-                          'kwargs': {'regexp': '', 'sub': '',}},
 
+                          {'package': 'attr_rewrite',
+                          'name': 'regexp_replace',
+                          'kwargs': {'regexp': 'unical', 'sub': 'gnocca',}},
+
+                          {'package': 'attr_rewrite',
+                          'name': 'add_static_attribute',
+                          'kwargs': {'name': 'eduPersonOrcid', 'value': 'ingoalla',}},
+
+                          {'package': 'attr_rewrite',
+                          'name': 'copy_attribute_value',
+                          'kwargs': {'from_attr': 'uid',
+                                     'to_attr': 'schacPersonalUniqueID',
+                                     'suffix': '',
+                                     'prefix': 'urn:schac:personalUniqueID:IT:CF:',
+                                     }},
                         ]
             )
 

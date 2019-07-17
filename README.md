@@ -1,8 +1,18 @@
-pyLDAP
+pyMultiLDAP
 -----
 
-This tool was written to handle multiple LDAP sources for data aggregations tasks.
+Handle multiple LDAP sources, do data aggregations and manipulation with rewrite rules.
 
+### Why?
+I developed this tool for manage data migrations from multiple LDAP server,
+aggregate accounts, manipulate data before migrate them to an unique LDAP.
+This tool can connect and do specialized query to many servers and apply custom functions to
+manipulate datas.
+
+This tool do not write to the destination LDAP server but permit us to handle data
+in a way that could be very simple to produce ldif or json files.
+
+See `settings.py.example` and `attr_rewrite.py` for understand how to configure and extend it.
 
 ### Setup
 Configure multiple connections and search paramenters in `settings.py`.
@@ -10,6 +20,8 @@ Configure multiple connections and search paramenters in `settings.py`.
 Install dependencies
 ````
 pip install -r requirements
+# or
+pip install ldap3
 ````
 
 #### LdapClient Class usage
@@ -29,7 +41,7 @@ See `run_test.py`.
 
 Difference between `.search` and `.get`:
 - *search* relyies on connection configuration and returns result as it come (raw);
-- *get* handles custom search filter and can retrieve result as dictionary or json format.
+- *get* handles custom search filter and retrieve result as dictionary or json format. It also apply rewrite rules.
 
 ````
 import copy
@@ -80,11 +92,7 @@ for i in LDAP_CONNECTIONS:
 ````
 
 #### ldap_asycio.py example
+This is a WIP, probably also a multiprocess example will be done in the future.
 ````
 time python ldap_aio.py
 ````
-
-#### WIP
-
-- [settings.py] Add a modifier function to remap and rewrite attributes for every configured endpoint.
-    . Done, still remaining some rewrite rules as example.
