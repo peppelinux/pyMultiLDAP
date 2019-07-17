@@ -5,7 +5,7 @@ from client import LdapClient
 from settings import LDAP_CONNECTIONS
 
 
-logger = logging.getLogger('ldap_client')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 stdout = logging.StreamHandler()
 stdout.setLevel(logging.DEBUG)
@@ -30,10 +30,12 @@ for i in LDAP_CONNECTIONS:
 
     lc.strategy = 'RESTARTABLE'
     print('# ', lc.conf['connection']['client_strategy'])
+    print('# as DICT')
     r = lc.get(format='dict')
     print(r) if r else ''
 
     r = lc.get(format='json')
+    print('# as JSON')
     print(r) if r else ''
 
     # lc.strategy = 'REUSABLE'
@@ -43,7 +45,6 @@ for i in LDAP_CONNECTIONS:
 
     r = lc.get(format='json')
     print(r) if r else ''
-
 
     # get result in original format
     r = lc.get()

@@ -1,4 +1,5 @@
 import copy
+import importlib
 import ldap3
 import logging
 import json
@@ -47,24 +48,17 @@ class LdapClient(object):
                 for k,v in attr_dict.items() }
 
     def _as_json(self, r):
-        result = dict()
-        if not r: return result
-        if self.strategy in (ldap3.SYNC, ldap3.RESTARTABLE):
-            for entry in r:
-                result[entry.entry_dn] = json.loads(entry.entry_to_json())
-        else:
-            for entry in r[0]:
-                result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
-        return json.dumps(result, indent=2)
+        return json.dumps(r, indent=2)
 
     def _as_dict(self, r):
+        if isinstance(r, dict): return r
         result = dict()
         if not r: return result
         if self.strategy in (ldap3.SYNC, ldap3.RESTARTABLE):
             for entry in r:
                 result[entry.entry_dn] = entry.entry_attributes_as_dict
         else:
-            for entry in r[0]:
+            for entry in r:
                 if not result.get(entry['dn']):
                     result[entry['dn']] = dict()
                 result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
@@ -76,14 +70,41 @@ class LdapClient(object):
         _kwargs['search_filter'] = search if search else self.conf['search']['search_filter']
         r = self.search(**_kwargs)
         if not r: return
-        #logger.debug(json.dumps(r[1]))
+
+        entries = self._as_dict(r)
+
+        # Rewrite rules detection
+        if self.conf.get('rewrite_rules'):
+            rewritten_entries = {}
+            entries_dict = {}
+            for dn in entries:
+                for rule_index in range(len(self.conf['rewrite_rules'])):
+                    new_attrs = self.apply_attr_rewrite(entries[dn],
+                                                        rule_index)
+                    if new_attrs:
+                        rewritten_entries[dn] = new_attrs
+            entries = rewritten_entries
+        # END Rewrite rules detection
+
         # format
         if format:
             method = '_as_{}'.format(format)
             if hasattr(self, method):
-                return getattr(self, method)(r)
+                entries = getattr(self, method)(entries)
+            # entries = self._as_json(entries)
         else:
-            return r[0]
+            logger.debug("[Warning] rewrite rules can only be applied with a defined format")
+            entries = r[0]
+
+        return entries
+
+    def apply_attr_rewrite(self, attributes, package_index):
+        rule = self.conf['rewrite_rules'][package_index]
+        package = importlib.import_module(rule['package'])
+        logger.debug('[Rewrite Rule] Apply {}'.format(rule))
+        func = getattr(package, rule['name'])
+        new_attrs = func(attributes, **rule['kwargs'])
+        return new_attrs
 
     def __str__(self):
         return '{} - {} - {}'.format(self.conf['server']['host'],
