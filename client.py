@@ -13,6 +13,8 @@ class LdapClient(object):
         self.conf = LDAP_SRV_CONF
         self.conn = None
         self.strategy = LDAP_SRV_CONF['connection']['client_strategy']
+        ldap3.set_config_parameter('DEFAULT_SERVER_ENCODING',
+                                   LDAP_SRV_CONF['encoding'])
 
     def get_response(self, message_id=None):
         if self.conf['connection']['client_strategy'] in (ldap3.REUSABLE,
@@ -48,25 +50,26 @@ class LdapClient(object):
                 result.append(entry.entry_to_json())
         else:
             for entry in r[0]:
-                result.append(json.dumps(dict(entry['attributes']),
-                                         indent=2))
+                d = {k:[e.decode(self.conf['encoding']) for e in v]
+                     for k,v in entry['raw_attributes'].items()}
+                out = json.dumps(d, indent=2)
+                result.append(out)
         return ','.join(result)
 
-    def get(self, search=None ,size_limit=0, format='json'):
+    def get(self, search=None, size_limit=0, format=None):
         _kwargs = copy.copy(self.conf['search'])
         _kwargs['size_limit'] = size_limit
         _kwargs['search_filter'] = search if search else self.conf['search']['search_filter']
         r = self.search(**_kwargs)
         if not r: return
+        #logger.debug(json.dumps(r[1]))
         # format
-        if format == 'json':
-            return self._as_json(r)
-        elif format == 'ldif':
-            # TODO
-            pass
+        if format:
+            method = '_as_{}'.format(format)
+            if hasattr(self, method):
+                return getattr(self, method)(r)
         else:
-            return r
-
+            return r[0]
 
     def __str__(self):
         return '{} - {} - {}'.format(self.conf['server']['host'],

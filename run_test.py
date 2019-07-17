@@ -18,13 +18,21 @@ for i in LDAP_CONNECTIONS:
     print('# Results from: {} ...'.format(lc))
     kwargs = copy.copy(lc.conf)
     r = lc.get(search="(&(sn=aie*)(givenName=isa*))")
-    print(r+',') if r else []
+    print(r+',') if r else ''
 
     # like wildcard
     r = lc.get(search="(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP83*))")
-    print(r+',') if r else []
+    print(r+',') if r else ''
 
-    kwargs['search']['search_filter'] = "(&(sn=de marco))"
-    r = lc.search(**kwargs['search'])
+    # using search method with overload of configuration
+    #kwargs['search']['search_filter'] = "(&(sn=de marco))"
+    #r = lc.search(**kwargs['search'])
+
+    r = lc.get(format='json')
+    print(r+',') if r else ''
+
+    # get result in original format
+    r = lc.get()
+    print(r) if r else ''
 
     print('# End {}'.format(i))

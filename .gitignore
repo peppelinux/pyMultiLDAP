@@ -1,2 +1,6 @@
 settings.py
 *__pycache__/*
+<<<<<<< HEAD
+=======
+*.pyc
+>>>>>>> 57cd8ca7b52879da4ef32877718cd576c4ea0b94
