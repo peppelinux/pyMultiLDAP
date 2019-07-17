@@ -46,6 +46,11 @@ DEFAULT = dict(server =
                         [{'package': 'attr_rewrite',
                          'name': 'replace',
                          'kwargs': {'from_str': 'unical', 'to_str': 'lacinu',}},
+
+                         {'package': 'attr_rewrite',
+                          'name': 'regexp_replace',
+                          'kwargs': {'regexp': '', 'sub': '',}},
+
                         ]
             )
 
@@ -94,6 +99,11 @@ LDAPTEST = dict(server =
                         [{'package': 'attr_rewrite',
                          'name': 'replace',
                          'kwargs': {'from_str': 'testunical', 'to_str': 'unical',}},
+
+                         {'package': 'attr_rewrite',
+                          'name': 'regexp_replace',
+                          'kwargs': {'regexp': '', 'sub': '',}},
+
                         ]
             )
 

@@ -63,25 +63,26 @@ class LdapClient(object):
                 result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
         return result
 
+    def _apply_rewrites(self, entries):
+        rewritten_entries = {}
+        for dn in entries:
+            for rule_index in range(len(self.conf['rewrite_rules'])):
+                rewritten_entries[dn] = self.apply_attr_rewrite(entries[dn],
+                                                                rule_index)
+        return rewritten_entries
+    
     def get(self, search=None, size_limit=0, format=None):
         _kwargs = copy.copy(self.conf['search'])
         _kwargs['size_limit'] = size_limit
         _kwargs['search_filter'] = search if search else self.conf['search']['search_filter']
         r = self.search(**_kwargs)
         if not r: return
-
         entries = self._as_dict(r)
 
         # Rewrite rules detection
+        # TODO: Specialize a private method here :)
         if self.conf.get('rewrite_rules'):
-            rewritten_entries = {}
-            for dn in entries:
-                for rule_index in range(len(self.conf['rewrite_rules'])):
-                    new_attrs = self.apply_attr_rewrite(entries[dn],
-                                                        rule_index)
-                    if new_attrs:
-                        rewritten_entries[dn] = new_attrs
-            entries = rewritten_entries
+            entries = self._apply_rewrites(entries)
         # END Rewrite rules detection
 
         # format
@@ -89,9 +90,9 @@ class LdapClient(object):
             method = '_as_{}'.format(format)
             if hasattr(self, method):
                 entries = getattr(self, method)(entries)
-            # entries = self._as_json(entries)
         else:
-            logger.debug("[Warning] rewrite rules can only be applied with a defined format")
+            logger.debug(("[Warning] rewrite rules can only "
+                          "be applied with a defined format"))
             entries = r[0]
 
         return entries
