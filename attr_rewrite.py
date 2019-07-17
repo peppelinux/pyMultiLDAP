@@ -11,9 +11,6 @@ def replace(attrs, from_str='', to_str='', to_attrs=[], encoding='utf-8'):
     """
     d = dict()
     for k,v in attrs.items():
-        if isinstance(v, str):
-            d[k] = v.replace(from_str, to_str)
-        elif isinstance(v, list):
-            items = [e.decode(encoding) if isinstance(e, bytes) else e for e in v]
-            d[k] = [e.replace(from_str, to_str) for e in items]
+        items = [e.decode(encoding) if isinstance(e, bytes) else e for e in v]
+        d[k] = [e.replace(from_str, to_str) for e in items]
     return d
