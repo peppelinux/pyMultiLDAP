@@ -103,7 +103,8 @@ class LdapClient(object):
         package = importlib.import_module(rule['package'])
         logger.debug('[Rewrite Rule] Apply {}'.format(rule))
         func = getattr(package, rule['name'])
-        new_attrs = func(attributes, **rule['kwargs'])
+        new_attrs = func(attributes, encoding=self.conf['encoding'],
+                         **rule['kwargs'])
         return new_attrs
 
     def __str__(self):

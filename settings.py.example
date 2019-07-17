@@ -41,7 +41,12 @@ DEFAULT = dict(server =
                                        ]
 
                         ),
-                    encoding = 'utf-8'
+                    encoding = 'utf-8',
+                  rewrite_rules =
+                        [{'package': 'attr_rewrite',
+                         'name': 'replace',
+                         'kwargs': {'from_str': 'unical', 'to_str': 'lacinu',}},
+                        ]
             )
 
 LDAPTEST = dict(server =
@@ -85,10 +90,10 @@ LDAPTEST = dict(server =
 
                         ),
                     encoding = 'utf-8',
-                    rewrite_rules =
+                  rewrite_rules =
                         [{'package': 'attr_rewrite',
                          'name': 'replace',
-                         'kwargs': {'from': 'testunical', 'to': 'unical',}},
+                         'kwargs': {'from_str': 'testunical', 'to_str': 'unical',}},
                         ]
             )
 
