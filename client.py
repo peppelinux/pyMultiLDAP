@@ -34,7 +34,6 @@ class LdapClient(object):
             server = ldap3.Server(**self.conf['server'])
             self.conn = ldap3.Connection(server, **self.conf['connection'])
 
-
     def search(self, **kwargs):
         self.ensure_connection()
         _kwargs = kwargs if kwargs else self.conf['search']
@@ -76,7 +75,6 @@ class LdapClient(object):
         # Rewrite rules detection
         if self.conf.get('rewrite_rules'):
             rewritten_entries = {}
-            entries_dict = {}
             for dn in entries:
                 for rule_index in range(len(self.conf['rewrite_rules'])):
                     new_attrs = self.apply_attr_rewrite(entries[dn],
@@ -103,7 +101,8 @@ class LdapClient(object):
         package = importlib.import_module(rule['package'])
         logger.debug('[Rewrite Rule] Apply {}'.format(rule))
         func = getattr(package, rule['name'])
-        new_attrs = func(attributes, **rule['kwargs'])
+        new_attrs = func(attributes, encoding=self.conf['encoding'],
+                         **rule['kwargs'])
         return new_attrs
 
     def __str__(self):

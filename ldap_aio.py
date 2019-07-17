@@ -9,12 +9,13 @@ LDAP_SERVERS = []
 
 async def get_result(lc):
     await asyncio.sleep(0.001)
-    return lc.get()
+    return lc.get(format='dict')
 
 async def get_server(CONF):
     return LdapClient(CONF)
 
 async def ensure_connection(lc):
+    await asyncio.sleep(0.001)
     lc.ensure_connection()
 
 async def connect(lc_id: int):
@@ -22,11 +23,11 @@ async def connect(lc_id: int):
     lc = await get_server(LDAP_CONNECTIONS[CONF])
     # LDAP_SERVERS.append(lc)
     print('Connectign and gathering {} [{}]'.format(lc, CONF))
-    await ensure_connection(lc)
+    # await ensure_connection(lc)
     try:
         result = await get_result(lc)
-        result_set.extend(result[0])
-        print('Get {} results from {}'.format(len(result[0]), lc))
+        result_set.extend(result)
+        print('Get {} results from {}'.format(len(result), lc))
     except Exception as e:
         print('-- Fail to connect to {} [{}]'.format(lc, CONF))
         print(e)
