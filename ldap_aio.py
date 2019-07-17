@@ -14,11 +14,15 @@ async def get_result(lc):
 async def get_server(CONF):
     return LdapClient(CONF)
 
+async def ensure_connection(lc):
+    lc.ensure_connection()
+
 async def connect(lc_id: int):
     CONF = list(LDAP_CONNECTIONS.keys())[lc_id]
     lc = await get_server(LDAP_CONNECTIONS[CONF])
     # LDAP_SERVERS.append(lc)
     print('Connectign and gathering {} [{}]'.format(lc, CONF))
+    await ensure_connection(lc)
     try:
         result = await get_result(lc)
         result_set.extend(result[0])
