@@ -22,14 +22,28 @@ for i in LDAP_CONNECTIONS:
 
     # like wildcard
     r = lc.get(search="(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP83*))")
-    print(r+',') if r else ''
+    print(r, ',') if r else ''
 
     # using search method with overload of configuration
     #kwargs['search']['search_filter'] = "(&(sn=de marco))"
     #r = lc.search(**kwargs['search'])
 
+    lc.strategy = 'RESTARTABLE'
+    print('# ', lc.conf['connection']['client_strategy'])
+    r = lc.get(format='dict')
+    print(r) if r else ''
+
     r = lc.get(format='json')
-    print(r+',') if r else ''
+    print(r) if r else ''
+
+    # lc.strategy = 'REUSABLE'
+    print('# ', lc.conf['connection']['client_strategy'])
+    r = lc.get(format='dict')
+    print(r) if r else ''
+
+    r = lc.get(format='json')
+    print(r) if r else ''
+
 
     # get result in original format
     r = lc.get()

@@ -42,19 +42,33 @@ class LdapClient(object):
                                               result))
         return self.get_response(result)
 
+    def _decode_elements(self, attr_dict):
+        return {k:[e.decode(self.conf['encoding'] if isinstance(e, bytes) else e) for e in v]
+                for k,v in attr_dict.items() }
+
     def _as_json(self, r):
-        result = []
+        result = dict()
         if not r: return result
         if self.strategy in (ldap3.SYNC, ldap3.RESTARTABLE):
             for entry in r:
-                result.append(entry.entry_to_json())
+                result[entry.entry_dn] = json.loads(entry.entry_to_json())
         else:
             for entry in r[0]:
-                d = {k:[e.decode(self.conf['encoding']) for e in v]
-                     for k,v in entry['raw_attributes'].items()}
-                out = json.dumps(d, indent=2)
-                result.append(out)
-        return ','.join(result)
+                result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
+        return json.dumps(result, indent=2)
+
+    def _as_dict(self, r):
+        result = dict()
+        if not r: return result
+        if self.strategy in (ldap3.SYNC, ldap3.RESTARTABLE):
+            for entry in r:
+                result[entry.entry_dn] = entry.entry_attributes_as_dict
+        else:
+            for entry in r[0]:
+                if not result.get(entry['dn']):
+                    result[entry['dn']] = dict()
+                result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
+        return result
 
     def get(self, search=None, size_limit=0, format=None):
         _kwargs = copy.copy(self.conf['search'])
