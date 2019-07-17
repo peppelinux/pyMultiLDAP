@@ -48,7 +48,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 stdout.setFormatter(formatter)
 logger.addHandler(stdout)
 
-lc = LdapClient(LDAP_CONNECTIONS['SAMVICE'])
+lc = LdapClient(LDAP_CONNECTIONS['DEFAULT'])
 
 kwargs = copy.copy(lc.conf)
 kwargs['search']['search_filter'] = "(&(sn=de medici)(givenName=aurora))"
@@ -84,6 +84,7 @@ for i in LDAP_CONNECTIONS:
 time python ldap_aio.py
 ````
 
-#### TODO
+#### WIP
 
-- [settings.py] Add a modifier function to remap and rewrite attributes for every configured endpoint;
+- [settings.py] Add a modifier function to remap and rewrite attributes for every configured endpoint.
+    . Done, still remaining some rewrite rules as example.

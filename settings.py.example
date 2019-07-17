@@ -1,7 +1,7 @@
 import ldap3
 
 
-SAMVICE = dict(server =
+DEFAULT = dict(server =
                    dict(host = 'ldaps://thathost.unical.it',
                         connect_timeout = 5,
                         # TLS...
@@ -84,9 +84,14 @@ LDAPTEST = dict(server =
                                        ]
 
                         ),
-                    encoding = 'utf-8'
+                    encoding = 'utf-8',
+                    rewrite_rules =
+                        [{'package': 'attr_rewrite',
+                         'name': 'replace',
+                         'kwargs': {'from': 'testunical', 'to': 'unical',}},
+                        ]
             )
 
 # put multiple connections here
-LDAP_CONNECTIONS = {'SAMVICE' : SAMVICE,
+LDAP_CONNECTIONS = {'DEFAULT' : DEFAULT,
                     'LDAPTEST' : LDAPTEST}
