@@ -1,0 +1,2 @@
+- https://github.com/hughrobb/aioldap3
+- https://github.com/cannatag/ldap3/issues/182
