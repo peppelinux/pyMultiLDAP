@@ -1,4 +1,5 @@
 import copy
+import importlib
 import ldap3
 import logging
 import json
@@ -33,7 +34,6 @@ class LdapClient(object):
             server = ldap3.Server(**self.conf['server'])
             self.conn = ldap3.Connection(server, **self.conf['connection'])
 
-
     def search(self, **kwargs):
         self.ensure_connection()
         _kwargs = kwargs if kwargs else self.conf['search']
@@ -42,35 +42,69 @@ class LdapClient(object):
                                               result))
         return self.get_response(result)
 
+    def _decode_elements(self, attr_dict):
+        return {k:[e.decode(self.conf['encoding'] if isinstance(e, bytes) else e) for e in v]
+                for k,v in attr_dict.items() }
+
     def _as_json(self, r):
-        result = []
+        return json.dumps(r, indent=2)
+
+    def _as_dict(self, r):
+        if isinstance(r, dict): return r
+        result = dict()
         if not r: return result
         if self.strategy in (ldap3.SYNC, ldap3.RESTARTABLE):
             for entry in r:
-                result.append(entry.entry_to_json())
+                result[entry.entry_dn] = entry.entry_attributes_as_dict
         else:
-            for entry in r[0]:
-                d = {k:[e.decode(self.conf['encoding']) for e in v]
-                     for k,v in entry['raw_attributes'].items()}
-                out = json.dumps(d, indent=2)
-                result.append(out)
-        return ','.join(result)
+            for entry in r:
+                if not result.get(entry['dn']):
+                    result[entry['dn']] = dict()
+                result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
+        return result
 
+    def _apply_rewrites(self, entries):
+        rewritten_entries = {}
+        for dn in entries:
+            for rule_index in range(len(self.conf['rewrite_rules'])):
+                rewritten_entries[dn] = self.apply_attr_rewrite(entries[dn],
+                                                                rule_index)
+        return rewritten_entries
+    
     def get(self, search=None, size_limit=0, format=None):
         _kwargs = copy.copy(self.conf['search'])
         _kwargs['size_limit'] = size_limit
         _kwargs['search_filter'] = search if search else self.conf['search']['search_filter']
         r = self.search(**_kwargs)
         if not r: return
-        #logger.debug(json.dumps(r[1]))
+        entries = self._as_dict(r)
+
+        # Rewrite rules detection
+        # TODO: Specialize a private method here :)
+        if self.conf.get('rewrite_rules'):
+            entries = self._apply_rewrites(entries)
+        # END Rewrite rules detection
+
         # format
         if format:
             method = '_as_{}'.format(format)
             if hasattr(self, method):
-                return getattr(self, method)(r)
+                entries = getattr(self, method)(entries)
         else:
-            return r[0]
+            logger.debug(("[Warning] rewrite rules can only "
+                          "be applied with a defined format"))
+            entries = r[0]
 
+        return entries
+
+    def apply_attr_rewrite(self, attributes, package_index):
+        rule = self.conf['rewrite_rules'][package_index]
+        package = importlib.import_module(rule['package'])
+        logger.debug('[Rewrite Rule] Apply {}'.format(rule))
+        func = getattr(package, rule['name'])
+        new_attrs = func(attributes, encoding=self.conf['encoding'],
+                         **rule['kwargs'])
+        return new_attrs
 
     def __str__(self):
         return '{} - {} - {}'.format(self.conf['server']['host'],

@@ -1,7 +1,7 @@
 import ldap3
 
 
-SAMVICE = dict(server =
+DEFAULT = dict(server =
                    dict(host = 'ldaps://thathost.unical.it',
                         connect_timeout = 5,
                         # TLS...
@@ -41,7 +41,29 @@ SAMVICE = dict(server =
                                        ]
 
                         ),
-                    encoding = 'utf-8'                    
+                    encoding = 'utf-8',
+                  rewrite_rules =
+                        [{'package': 'attr_rewrite',
+                         'name': 'replace',
+                         'kwargs': {'from_str': 'unical', 'to_str': 'lacinu',}},
+
+
+                          {'package': 'attr_rewrite',
+                          'name': 'regexp_replace',
+                          'kwargs': {'regexp': 'unical', 'sub': 'gnocca',}},
+
+                          {'package': 'attr_rewrite',
+                          'name': 'add_static_attribute',
+                          'kwargs': {'name': 'eduPersonOrcid', 'value': 'ingoalla',}},
+
+                          {'package': 'attr_rewrite',
+                          'name': 'copy_attribute_value',
+                          'kwargs': {'from_attr': 'uid',
+                                     'to_attr': 'schacPersonalUniqueID',
+                                     'suffix': '',
+                                     'prefix': 'urn:schac:personalUniqueID:IT:CF:',
+                                     }},
+                        ]
             )
 
 LDAPTEST = dict(server =
@@ -84,9 +106,19 @@ LDAPTEST = dict(server =
                                        ]
 
                         ),
-                    encoding = 'utf-8'
+                    encoding = 'utf-8',
+                  rewrite_rules =
+                        [{'package': 'attr_rewrite',
+                         'name': 'replace',
+                         'kwargs': {'from_str': 'testunical', 'to_str': 'unical',}},
+
+                         {'package': 'attr_rewrite',
+                          'name': 'regexp_replace',
+                          'kwargs': {'regexp': '', 'sub': '',}},
+
+                        ]
             )
 
 # put multiple connections here
-LDAP_CONNECTIONS = {'SAMVICE' : SAMVICE,
+LDAP_CONNECTIONS = {'DEFAULT' : DEFAULT,
                     'LDAPTEST' : LDAPTEST}
