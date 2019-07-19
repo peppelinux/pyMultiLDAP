@@ -71,7 +71,13 @@ class LdapClient(object):
         rewritten_entries = {}
         for dn in entries:
             for rule_index in range(len(self.conf['rewrite_rules'])):
-                rewritten_entries[dn] = self.apply_attr_rewrite(entries[dn],
+                # this, otherwise multiple rules on
+                # the same dn will not be overwrited...
+                if rewritten_entries.get(dn):
+                    entry = rewritten_entries[dn]
+                else:
+                    entry = entries[dn]
+                rewritten_entries[dn] = self.apply_attr_rewrite(entry,
                                                                 rule_index)
         return rewritten_entries
     

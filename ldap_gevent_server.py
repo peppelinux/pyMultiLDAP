@@ -1,6 +1,7 @@
 #import gevent
-
 #from gevent import monkey; monkey.patch_all()
+from time import time
+
 from gevent.server import StreamServer
 
 from client import LdapClient
@@ -26,16 +27,21 @@ def handle(socket, address):
             result = []
             dec_line = line.decode('utf-8').replace('\n', '')
             for conn in connections:
-                conn.set_search_filter('({})'.format(dec_line))
+                conn.set_search_filter('{}'.format(dec_line))
                 sf = conn.conf['search']['search_filter']
-                socket.sendall(sf.encode())
+                socket.sendall('{}\n'.format(sf).encode())
                 try:
+                    start = time()
                     result.append(conn.get(format='json'))
+                    end = time()
+                    elapsed = '[{}] elapsed in: {}'.format(sf,
+                                                           (end - start))
+                    print(elapsed)
                 except Exception as exp:
                     socket.sendall('{}\n'.format(exp).encode())
                 res = ''.join(result) + '\n'
                 socket.sendall(res.encode())
-        print("< {}".format(line))
+        #print("< {}".format(line))
     rfileobj.close()
 
 if __name__ == '__main__':
