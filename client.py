@@ -18,14 +18,17 @@ class LdapClient(object):
                                    LDAP_SRV_CONF['encoding'])
 
     def get_response(self, message_id=None):
-        if self.conf['connection']['client_strategy'] in (ldap3.REUSABLE,
-                                                          ldap3.ASYNC):
+        if self.strategy in (ldap3.REUSABLE,
+                             ldap3.ASYNC):
             # message_id for async stragegy
             results = self.conn.get_response(message_id)
         else:
             results = self.conn.entries
         return results
 
+    def set_search_filter(self, search_filter):
+        self.conf['search']['search_filter'] = search_filter
+    
     def ensure_connection(self):
         search_kwargs = copy.deepcopy(self.conf['search'])
         search_kwargs['size_limit'] = 1
@@ -35,7 +38,8 @@ class LdapClient(object):
             self.conn = ldap3.Connection(server, **self.conf['connection'])
 
     def search(self, **kwargs):
-        self.ensure_connection()
+        if self.strategy in (ldap3.REUSABLE, ldap3.ASYNC):
+            self.ensure_connection()
         _kwargs = kwargs if kwargs else self.conf['search']
         result = self.conn.search(**_kwargs)
         logger.debug('result [{}]: {}'.format(self.conf['connection']['client_strategy'],
