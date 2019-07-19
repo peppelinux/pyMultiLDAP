@@ -15,21 +15,18 @@ logger.addHandler(stdout)
 
 for i in LDAP_CONNECTIONS:
     lc = LdapClient(LDAP_CONNECTIONS[i])
-    print('# Results from: {} ...'.format(lc))
-    kwargs = copy.copy(lc.conf)
-    r = lc.get(search="(&(sn=aie*)(givenName=isa*))")
-    print(r)
+    #print('# Results from: {} ...'.format(lc))
 
     # like wildcard
-    r = lc.get(search="(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP83*))")
-    print(r)
+    #r = lc.get(search="(&(sn=de marco)(schacPersonalUniqueId=*DMRGPP83*))")
+    #print(r)
 
     # using search method with overload of configuration
     #kwargs['search']['search_filter'] = "(&(sn=de marco))"
     #r = lc.search(**kwargs['search'])
 
     lc.strategy = 'RESTARTABLE'
-    print('# ', lc.conf['connection']['client_strategy'])
+    print('# ', lc.strategy)
     print('# as DICT')
     r = lc.get(format='dict')
     print(r) if r else ''
@@ -38,8 +35,8 @@ for i in LDAP_CONNECTIONS:
     print('# as JSON')
     print(r) if r else ''
 
-    # lc.strategy = 'REUSABLE'
-    print('# ', lc.conf['connection']['client_strategy'])
+    lc.strategy = 'REUSABLE'
+    print('# ', lc.strategy)
     r = lc.get(format='dict')
     print(r) if r else ''
 

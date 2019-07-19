@@ -49,15 +49,15 @@ class LdapClient(object):
     def _as_json(self, r):
         return json.dumps(r, indent=2)
 
-    def _as_dict(self, r):
-        if isinstance(r, dict): return r
+    def _as_dict(self, res):
+        if isinstance(res, dict): return res
         result = dict()
-        if not r: return result
+        if not res or not res[0]: return result
         if self.strategy in (ldap3.SYNC, ldap3.RESTARTABLE):
-            for entry in r:
-                result[entry.entry_dn] = entry.entry_attributes_as_dict
+            for entry in res[0]:
+                result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
         else:
-            for entry in r:
+            for entry in res[0]:
                 if not result.get(entry['dn']):
                     result[entry['dn']] = dict()
                 result[entry['dn']] = self._decode_elements(entry['raw_attributes'])
