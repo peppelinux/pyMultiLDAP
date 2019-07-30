@@ -17,6 +17,7 @@ class LdapClient(object):
     def __init__(self, LDAP_SRV_CONF):
         self.conf = LDAP_SRV_CONF
         self.conn = None
+        self.server = None
         self.strategy = LDAP_SRV_CONF['connection']['client_strategy']
 
     def get_response(self, message_id=None, timeout=10):
@@ -34,8 +35,8 @@ class LdapClient(object):
     def connect(self):
         logger.info('Connecting to {}...'.format(self.conf['server']['host']))
         try:
-            server = ldap3.Server(**self.conf['server'])
-            self.conn = ldap3.Connection(server, **self.conf['connection'])
+            self.server = ldap3.Server(**self.conf['server'])
+            self.conn = ldap3.Connection(self.server, **self.conf['connection'])
         except LDAPMaximumRetriesError as excp:
             logger.error("Error: {}".format(excp))
 
@@ -75,6 +76,9 @@ class LdapClient(object):
     def _decode_elements(self, attr_dict):
         return {k:[e.decode(self.conf['encoding']) if isinstance(e, bytes) else e for e in v]
                 for k,v in attr_dict.items() }
+
+    def _as_object(self, res):
+        return type('', (object,), list(res.values())[0])()
 
     def _as_json(self, res):
         return json.dumps(res, indent=2)
@@ -171,19 +175,28 @@ class LdapClient(object):
         return new_attrs
 
     # @timeout(3)
-    def authenticate(self, user, password):
+    def authenticate(self, user, password, new_connection=False):
         if not self.conf.get('allow_authentication'):
-            logger.debug('Authentication disabled for [{}]'.format(self.conf['server']['host']))
+            msg = 'Authentication disabled for [{}]'
+            logger.debug(msg.format(self.conf['server']['host']))
             return
+        if not self.conn:
+            self.ensure_connection()
         _kwargs = copy.copy(self.conf['connection'])
         _kwargs['user'] = user
         _kwargs['password'] = password
+        status = False
         try:
-            server = ldap3.Server(**self.conf['server'])
-            self.conn = ldap3.Connection(server, **_kwargs)
-            return True
-        except:
-            return False
+            if new_connection:
+                server = ldap3.Server(**self.conf['server'])
+                status = ldap3.Connection(server, **_kwargs)
+            else:
+                status = self.conn.rebind(user, password)
+            return status
+        except Exception as excp:
+            msg = 'Authentication error: {}'.format(excp)
+            logger.error(msg)
+            return status
 
     def __str__(self):
         return '{} - {} - {}'.format(self.conf['server']['host'],

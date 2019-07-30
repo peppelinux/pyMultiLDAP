@@ -15,7 +15,7 @@ from gevent.server import StreamServer
 from ldap3.core.exceptions import (LDAPInvalidFilterError,
                                    LDAPMaximumRetriesError,
                                    LDAPSocketOpenError)
-from multildap.client import LdapClient
+from multildap.client import LdapClient, logger as logger_client
 from multildap.commands import (LdapCommand,
                                 LDAPUnrecognizesCommandAttributes,
                                 logger as logger_commands)
@@ -220,6 +220,7 @@ if __name__ == '__main__':
         logfile.setFormatter(formatter)
         logger.addHandler(logfile)
         logger_commands.addHandler(logfile)
+        logger_client.addHandler(logfile)
 
     stdout = logging.StreamHandler()
     stdout.setFormatter(formatter)
@@ -229,6 +230,10 @@ if __name__ == '__main__':
     logger_commands.setLevel(getattr(logging, args.loglevel))
     logger_commands.addHandler(stdout)
     logger_commands.propagate = False
+
+    logger_client.setLevel(getattr(logging, args.loglevel))
+    logger_client.addHandler(stdout)
+    logger_client.propagate = False
 
     # prevents double messages printing cause of propagation from handlers to ancestors
     logger.propagate = False

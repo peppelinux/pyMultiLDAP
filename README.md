@@ -58,7 +58,7 @@ See `examples/run_test.py`.
 
 Difference between `.search` and `.get`:
 - *search* relyies on connection configuration and returns result as it come (raw);
-- *get* handles custom search filter and retrieve result as dictionary or json or ldif format. It also apply rewrite rules.
+- *get* handles custom search filter and retrieve result as dictionary, json, ldif or python object format. It also apply rewrite rules.
 
 ````
 import copy
@@ -179,25 +179,25 @@ ldapadd -Y EXTERNAL -H ldapi:/// <<EOF
 dn: olcDatabase={4}sock,cn=config
 changeType: modify
 replace: olcAccess
-olcAccess: to * 
- by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage 
+olcAccess: to *
+ by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage
  by * break
 # the following permits self BIND by users
-olcAccess: to dn.subtree="dc=proxy,$BASEDC" 
- by self read 
+olcAccess: to dn.subtree="dc=proxy,$BASEDC"
+ by self read
  by * break
 # the following two permits SEARCH by idp and foreign auth system
-olcAccess: to dn.subtree="ou=people,$BASEDC"  
- by dn.children="ou=auth,$BASEDC" read 
- by self read 
- by * break 
-olcAccess: to dn.subtree="ou=people,$BASEDC" 
- by dn.children="ou=idp,$BASEDC" read 
- by self read 
- by * break 
-olcAccess: to * 
- by anonymous auth 
- by * break 
+olcAccess: to dn.subtree="ou=people,$BASEDC"
+ by dn.children="ou=auth,$BASEDC" read
+ by self read
+ by * break
+olcAccess: to dn.subtree="ou=people,$BASEDC"
+ by dn.children="ou=idp,$BASEDC" read
+ by self read
+ by * break
+olcAccess: to *
+ by anonymous auth
+ by * break
 EOF
 ````
 
