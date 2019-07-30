@@ -24,6 +24,17 @@ def replace(attrs, from_str='', to_str='', to_attrs=[], encoding='utf-8'):
         d[k] = [e.replace(from_str, to_str) for e in items]
     return d
 
+def append(attrs, value='', to_attrs=[], encoding='utf-8'):
+    """
+    to_attrs -> limits only to specified attributes
+    """
+    d = dict()
+    for k,v in attrs.items():
+        items = decode_iterables(v, encoding)
+        if value not in d[k]:
+            d[k] = v + value
+    return d
+
 
 def add_static_attribute(attrs, name='email', value='', **kwargs):
     if name in attrs and isinstance(attrs[name], list):
