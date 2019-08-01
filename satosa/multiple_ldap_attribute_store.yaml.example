@@ -1,0 +1,6 @@
+module: multildap.satosa.multiple_ldap_attribute_store.MultiLdapAttributeStore
+name: MultipleLdapAttributeStore
+config:
+  settings_path: /opt/pyMultiLDAP/settings.py
+  unique_attribute_to_match: edupersonprincipalname
+
