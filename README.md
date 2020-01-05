@@ -11,8 +11,8 @@ pyMultiLDAP can act also as a proxy server, behind openldap's slapd-sock backend
 - Export data in python dictionary, json or ldiff format;
 - Proxy Server, exposing a server daemon usable with [slapd-sock backend](https://www.openldap.org/software/man.cgi?query=slapd-sock).
 
-pyMultiLDAP do not write data to LDAP servers, it just permit us to handle readonly data
-in a way that could be very simple to automate smart data processing on-the-fly.
+pyMultiLDAP doesn't write to LDAP servers, it just handle readonly data.
+It's also used to automate smart data processing on-the-fly.
 
 See `example/settings.py.example` and `multildap/attr_rewrite.py` to understand how to configure and extend it.
 
