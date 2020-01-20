@@ -9,7 +9,6 @@ from ldap3.core.exceptions import LDAPException
 from multildap.client import LdapClient
 
 from satosa.micro_services.base import ResponseMicroService
-from satosa.logging_util import satosa_logging
 from satosa.response import Redirect
 from satosa.exception import SATOSAError
 
@@ -43,35 +42,35 @@ class MultiLdapAttributeStore(ResponseMicroService):
                             settings.LDAP_CONNECTIONS.items()}
 
         msg = "MultiLDAP Attribute Store microservice initialized"
-        satosa_logging(logger, logging.INFO, msg, None)
+        logger.info(msg)
         for conn in self.connections:
             msg = "MultiLDAP connection to: {}".format(conn)
-            satosa_logging(logger, logging.INFO, msg, None)
+            logger.info(msg)
 
 
     def process(self, context, data):
 
         # Use cache in mongoDB with cache duration of 5min
         #if self.attributes and self.config.get('attributes_cache', None):
-            #satosa_logging(logger, logging.DEBUG, 'Attr processor id: {}'.format(id(self)), None)
+            #logger.debug('Attr processor id: {}'.format(id(self)))
             #msg = "MultiLdapAttributeStore found previously fetched attributes"
-            #satosa_logging(logger, logging.INFO, msg, None)
+            #logger.info(msg)
             #return ResponseMicroService.process(self, context, data)
 
         for name,lc in self.connections.items():
             search_attr = self.config['unique_attribute_to_match']
 
-            # prevent exception on missin attr
+            # prevent exception on missing attr
             attr_value = data.attributes.get(search_attr, False)
             if not attr_value:
                 msg = '{} not found in {}'.format(search_attr, lc)
-                satosa_logging(logger, logging.DEBUG, msg, None)
+                logger.debug(msg)
                 continue
             if isinstance(attr_value, str):
                 attr_value = [attr_value]
 
             msg = ("MultiLdapAttributeStore searches for {} in {}".format(search_attr, lc))
-            satosa_logging(logger, logging.INFO, msg, None)
+            logger.info(msg)
 
             ldapfilter = '({}{}{})'.format(search_attr,
                                            self.config['ldap_filter_operator'],
@@ -80,7 +79,7 @@ class MultiLdapAttributeStore(ResponseMicroService):
             if not identity: continue
 
             msg = "MultiLdapAttributeStore matches on {}".format(search_attr)
-            satosa_logging(logger, logging.INFO, msg, None)
+            logger.info(msg)
 
             attributes = {}
             for k,v in identity.items():
@@ -88,12 +87,12 @@ class MultiLdapAttributeStore(ResponseMicroService):
                 if k not in attributes:
                     attributes[k] = v
                     msg = "MultiLdapAttributeStore created: {}".format([e for e in v.keys()])
-                    satosa_logging(logger, logging.DEBUG, msg, None)
+                    logger.debug(msg)
                 # TODO: check this update
                 elif k in attributes:
                     attributes[k].update(v)
 
                 data.attributes.update(copy.copy(attributes[k]))
-                satosa_logging(logger, logging.DEBUG, ''.format(data.attributes), None)
+                logger.debug( ''.format(data.attributes))
 
         return ResponseMicroService.process(self, context, data)
