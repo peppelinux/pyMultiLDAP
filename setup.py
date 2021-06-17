@@ -7,7 +7,7 @@ def readme():
         return f.read()
 
 setup(name=_name,
-      version='0.2',
+      version='0.3.0',
       zip_safe = False,
       description="LDAP client or proxy to multiple LDAP server",
       long_description=readme(),
@@ -16,7 +16,7 @@ setup(name=_name,
                    'License :: OSI Approved :: BSD License',
                    'Programming Language :: Python :: 2',
                    'Programming Language :: Python :: 3'],
-      url='https://github.com/peppelinux/{}'.format(_name),
+      url='https://github.com/peppelinux/pyMultiLDAP',
       author='Giuseppe De Marco',
       author_email='giuseppe.demarco@unical.it',
       license='BSD',
