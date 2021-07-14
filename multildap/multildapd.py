@@ -256,9 +256,9 @@ if __name__ == '__main__':
 
     # register a signal
     sock = None
-    gevent.signal(signal.SIGTERM, stop_app, **{'pidfile': pidfile,
+    gevent.signal_handler(signal.SIGTERM, stop_app, **{'pidfile': pidfile,
                                                'socket': sock})
-    gevent.signal(signal.SIGINT, stop_app, **{'pidfile': pidfile,
+    gevent.signal_handler(signal.SIGINT, stop_app, **{'pidfile': pidfile,
                                               'socket': sock})
 
     if args.port:

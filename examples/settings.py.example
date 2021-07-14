@@ -128,11 +128,11 @@ LDAPTEST = dict(server =
                         ),
                   encoding = 'utf-8',
                   rewrite_rules =
-                        [{'package': 'attr_rewrite',
+                        [{'package': 'multildap.attr_rewrite',
                          'name': 'replace',
                          'kwargs': {'from_str': 'testunical', 'to_str': 'unical',}},
 
-                         {'package': 'attr_rewrite',
+                         {'package': 'multildap.attr_rewrite',
                           'name': 'regexp_replace',
                           'kwargs': {'regexp': '', 'sub': '',}},
 
