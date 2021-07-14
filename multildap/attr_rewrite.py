@@ -14,6 +14,28 @@ def regexp_replace(attrs, regexp='', sub='', encoding='utf-8'):
     return d
 
 
+def lowercase(attrs, fields=[], encoding='utf-8'):
+    """
+    fields -> limits only to specified attributes
+
+    rewrite_rules =
+    [
+
+         {'package': 'multildap.attr_rewrite',
+          'name': 'lowercase',
+          'kwargs': {'fields': ['email', 'mail']}
+         },
+
+    ...
+    """
+    d = attrs.copy()
+    for k,v in attrs.items():
+        if k in fields:
+            items = decode_iterables(v, encoding)
+            d[k] = [e.lower() for e in items]
+    return d
+
+
 def replace(attrs, from_str='', to_str='', to_attrs=[], encoding='utf-8'):
     """
     to_attrs -> limits only to specified attributes
