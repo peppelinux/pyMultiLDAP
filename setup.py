@@ -7,7 +7,7 @@ def readme():
         return f.read()
 
 setup(name=_name,
-      version='0.3.1',
+      version='0.3.2',
       zip_safe = False,
       description="LDAP client or proxy to multiple LDAP server",
       long_description=readme(),

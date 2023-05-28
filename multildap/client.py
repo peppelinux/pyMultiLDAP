@@ -50,7 +50,6 @@ class LdapClient(object):
     def ensure_connection(self):
         search_kwargs = copy.deepcopy(self.conf['search'])
         search_kwargs['size_limit'] = 1
-        search_kwargs['connect_timeout'] = self.conf['server']['connect_timeout']
         if self.conn and not self.conn.closed:
             try:
                 self.conn.search(**search_kwargs)
